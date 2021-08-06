@@ -23,6 +23,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hexad.librarymanagement.models.Book;
 
 /**
+ * This class performs integration testing for library management from
+ * controller class
+ * 
  * @author srake
  *
  */
@@ -41,7 +44,7 @@ public class LibraryControllerTest {
 	@Order(1)
 	void shouldAddNewBookToLibrary() throws Exception {
 		mockMvc.perform(MockMvcRequestBuilders.post("/library/addbook").contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(getRequestBook()))).andExpect(status().isOk());
+				.content(objectMapper.writeValueAsString(getRequestBook()))).andExpect(status().isCreated());
 	}
 
 	@Test
@@ -77,28 +80,29 @@ public class LibraryControllerTest {
 		mockMvc.perform(MockMvcRequestBuilders.post("/library/borrowbook/{userId}/{bookId}", 1, 1))
 				.andExpect(status().isOk());
 	}
-	
+
 	@Test
 	@Order(7)
 	void shouldThrowBookNotAvilableExceptionForUserTwo() throws Exception {
 		mockMvc.perform(MockMvcRequestBuilders.post("/library/borrowbook/{userId}/{bookId}", 2, 1))
 				.andExpect(status().isBadRequest());
 	}
-	
+
 	@Test
 	@Order(8)
 	void shouldThrowBorrowedLimitExceptionForUserOne() throws Exception {
 		mockMvc.perform(MockMvcRequestBuilders.post("/library/borrowbook/{userId}/{bookId}", 1, 3))
 				.andExpect(status().isConflict());
 	}
-	
+
 	@Test
 	@Order(9)
 	void shouldReturnBookToLibrary() throws Exception {
 		List<Integer> bookIdList = new ArrayList<>();
 		bookIdList.add(1);
-		mockMvc.perform(MockMvcRequestBuilders.post("/library/returnbook/{userId}",1).contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(bookIdList))).andExpect(status().isOk());
+		mockMvc.perform(MockMvcRequestBuilders.post("/library/returnbook/{userId}", 1)
+				.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(bookIdList)))
+				.andExpect(status().isOk());
 	}
 
 	private Book getRequestBook() {
